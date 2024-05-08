@@ -1,0 +1,138 @@
+﻿<Page
+    x:Class="ImageResizer.Views.PdfConverterPage"
+    Style="{DynamicResource MahApps.Styles.Page}"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:properties="clr-namespace:ImageResizer.Properties"
+    xmlns:icons="http://metro.mahapps.com/winfx/xaml/iconpacks"
+    xmlns:m="clr-namespace:ImageResizer.Models" 
+     xmlns:gif="http://wpfanimatedgif.codeplex.com"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:viewmodels="clr-namespace:ImageResizer.ViewModels"
+    d:DataContext="{d:DesignInstance Type=viewmodels:PdfConverterViewModel}"
+    mc:Ignorable="d"
+    AllowDrop="True"
+    d:DesignHeight="600" d:DesignWidth="450">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Drop">
+            <i:CallMethodAction MethodName="UIElement_OnDrop" TargetObject="{Binding}" />
+        </i:EventTrigger>
+        <i:EventTrigger EventName="DragEnter">
+            <i:CallMethodAction MethodName="UIElement_OnDragEnter" TargetObject="{Binding}"/>
+        </i:EventTrigger>
+        <i:EventTrigger EventName="DragLeave">
+            <i:CallMethodAction MethodName="UIElement_OnDragLeave" TargetObject="{Binding}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <Grid>
+        <Grid Margin="10" Visibility="{Binding DragDropGridVisibility}">
+            <Border  BorderThickness="10">
+                <Border.BorderBrush>
+                    <VisualBrush>
+                        <VisualBrush.Visual>
+                            <Rectangle StrokeDashArray="4 2" Stroke="Gray" StrokeThickness="1"
+                      Width="100" Height="100"/>
+                        </VisualBrush.Visual>
+                    </VisualBrush>
+                </Border.BorderBrush>
+            </Border>
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <icons:PackIconBootstrapIcons Kind="CloudArrowUp" HorizontalAlignment="Center" Height="100" Width="100"/>
+                <Label Content="Перетащите файл в выделенную область"  FontSize="18" FontWeight="Bold"/>
+            </StackPanel>
+        </Grid>
+        <Grid Opacity="{Binding OpacityMainGrid}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="48" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <TextBlock
+            Style="{StaticResource PageTitleStyle}"
+            Margin="{StaticResource MediumLeftMargin}"
+            Text="PDF в изображение" />
+            <Grid
+            Grid.Row="1"
+            Margin="{StaticResource MediumLeftRightMargin}">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Content="Открыть" Command="{Binding OpenFileCommand}" Width="100" Margin="10"/>
+                        <Button Content="Сохранить" Command="{Binding StartConvertCommand}" Width="100" Margin="10"/>
+                        <Button Content="Отмена" Background="#FF6DBBFF" Command="{Binding CancelCommand}" 
+                         Width="100" Margin="50,10,0,10" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <ListBox Name="OpenFileList"  ItemsSource="{Binding FileInfoList}" 
+                             SelectedItem="{Binding SelectedOpenFileItem}" 
+                             MinHeight="30" Width="350" MaxHeight="80" Margin="10,10,0,10">
+                            <ListBox.Resources>
+                                <DataTemplate DataType="{x:Type m:FileInfo}">
+                                    <Grid AutomationProperties.Name="{Binding ShortName}">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+
+                                        <StackPanel Orientation="Horizontal" Grid.Row="1">
+                                            <TextBlock  Text="{Binding ShortName}" FontWeight="Bold"/>
+                                            <TextBlock Text="     страниц "/>
+                                            <TextBlock Text="{Binding CountPage}" FontWeight="Bold"/>
+
+
+
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.Resources>
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="SelectionChanged">
+                                    <i:InvokeCommandAction Command="{Binding SelectListboxOpenFiles}"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </ListBox>
+                        <Button  Command="{Binding DeleteItemCommand}" Height="15" Padding="0" Foreground="Red" 
+                             CommandParameter="{Binding ElementName=OpenFileList}" 
+                             Visibility="{Binding ButtonDeleteVisibility}" VerticalAlignment="Top"
+                             IsEnabled="{Binding ButtonDeleteEnable}" Margin="2,10,0,0">
+                            <icons:BootstrapIcons Kind="XCircle"/>
+                        </Button>
+                    </StackPanel>
+                    <ComboBox Style="{StaticResource MahApps.Styles.ComboBox}" 
+          SelectedIndex="{Binding SelectedFileFormatIndex}" 
+          ItemsSource="{Binding FileFormatItems}" 
+          Height="50" Width="400" Margin="10" HorizontalAlignment="Left">
+                        <ComboBox.Resources>
+                            <DataTemplate DataType="{x:Type m:FileFormat}">
+                                <Grid AutomationProperties.Name="{Binding Name}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock  Text="{Binding Name}" FontWeight="Bold"/>
+                                    <StackPanel Orientation="Horizontal" Grid.Row="1">
+                                        <TextBlock Text="расширение "/>
+                                        <TextBlock Text="{Binding Format}" FontWeight="Bold"/>
+
+
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ComboBox.Resources>
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="SelectionChanged" >
+                                <i:InvokeCommandAction Command="{Binding ValueChangedResolutionCombobox}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </ComboBox>
+                    <StackPanel Visibility="{Binding LoadingResultVisibility}">
+                        <Label Margin="10" Content="Идет конвертация, пожалуйста подождите." />
+                        <Image  gif:ImageBehavior.AnimatedSource="\Resources\Loading2.gif" Width="60" Height="60" HorizontalAlignment="Left" Margin="200,0,0,0"/>
+                    </StackPanel>
+
+                </StackPanel>
+
+            </Grid>
+        </Grid>
+    </Grid>
+</Page>

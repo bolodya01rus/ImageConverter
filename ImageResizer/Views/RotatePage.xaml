@@ -1,0 +1,126 @@
+﻿<Page
+    x:Class="ImageResizer.Views.RotatePage"
+    Style="{DynamicResource MahApps.Styles.Page}"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:properties="clr-namespace:ImageResizer.Properties"
+    xmlns:icons="http://metro.mahapps.com/winfx/xaml/iconpacks" 
+    xmlns:viewmodels="clr-namespace:ImageResizer.ViewModels" 
+    xmlns:conv="clr-namespace:ImageResizer.Converters" 
+    xmlns:m="clr-namespace:ImageResizer.Models"
+    d:DataContext="{d:DesignInstance Type=viewmodels:RotateViewModel}"
+    mc:Ignorable="d" 
+    AllowDrop="True"
+    d:DesignHeight="600" d:DesignWidth="450">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Drop">
+            <i:CallMethodAction MethodName="UIElement_OnDrop" TargetObject="{Binding}" />
+        </i:EventTrigger>
+        <i:EventTrigger EventName="DragEnter">
+            <i:CallMethodAction MethodName="UIElement_OnDragEnter" TargetObject="{Binding}"/>
+        </i:EventTrigger>
+        <i:EventTrigger EventName="DragLeave">
+            <i:CallMethodAction MethodName="UIElement_OnDragLeave" TargetObject="{Binding}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <Page.Resources>
+        <conv:ImageConverter x:Key="ImageConverter"/>
+    </Page.Resources>
+    <Grid>
+        <Grid Opacity="{Binding OpacityMainGrid}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="48" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <TextBlock
+            Style="{StaticResource PageTitleStyle}"
+            Margin="{StaticResource MediumLeftMargin}"
+            Text="Повернуть изображение" />
+            <Grid
+            Grid.Row="1"
+            Margin="{StaticResource MediumLeftRightMargin}">
+                <StackPanel HorizontalAlignment="Left">
+                    <StackPanel Orientation="Horizontal">
+                        <Button Content="Открыть" Command="{Binding OpenFileCommand}" Width="100" Margin="10"/>
+                        <Button Content="Сохранить" Command="{Binding RotateCommand}"
+                            Width="100" Margin="10"/>
+                        <Button Content="Отмена" Background="#FF6DBBFF" Command="{Binding CancelCommand}" 
+                            Width="100" Margin="50,10,0,10" />
+
+                    </StackPanel>
+
+                    <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <ListBox MinHeight="30" Width="350" MaxHeight="80"  ItemsSource="{Binding FileInfoList}" 
+                             SelectedItem="{Binding SelectedItem}" Margin="10,0,2,0"
+                             Name="OpenFileList">
+                                <ListBox.Resources>
+                                    <DataTemplate DataType="{x:Type m:FileInfo}">
+                                        <Grid AutomationProperties.Name="{Binding ShortName}">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition/>
+                                                <RowDefinition/>
+                                            </Grid.RowDefinitions>
+
+                                            <StackPanel Orientation="Horizontal" Grid.Row="1">
+                                                <TextBlock  Text="{Binding ShortName}" FontWeight="Bold"/>
+                                                <TextBlock Text="     разрешение "/>
+                                                <TextBlock Text="{Binding Width}" FontWeight="Bold"/>
+                                                <TextBlock Text="x"/>
+                                                <TextBlock Text="{Binding Height}" FontWeight="Bold"/>
+
+                                            </StackPanel>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.Resources>
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="SelectionChanged">
+                                        <i:InvokeCommandAction Command="{Binding SelectionChangedCommand}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </ListBox>
+                            <Button  Command="{Binding DeleteItemCommand}" Height="15" Padding="0" Foreground="Red" VerticalAlignment="Top"
+                            CommandParameter="{Binding ElementName=OpenFileList}" Visibility="{Binding ButtonDeleteVisibility}" IsEnabled="{Binding ButtonDeleteEnable}" Margin="2,0,0,0">
+                                <icons:BootstrapIcons Kind="XCircle"/>
+                            </Button>
+                        </StackPanel>
+                        <Image Width="400" Height="250" Source="{Binding ImageOutput, Converter={StaticResource ImageConverter}}"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+
+                        <Button ToolTip="Повернуть на 90&#186; влево" Command="{Binding RotateLeftCommand}">
+                            <icons:BootstrapIcons Kind="ArrowCounterclockwise"/>
+                        </Button>
+                        <Button ToolTip="Повернуть на 90&#186; вправо" Command="{Binding RotateRightCommand}">
+                            <icons:BootstrapIcons Kind="ArrowClockwise"/>
+                        </Button>
+
+                    </StackPanel>
+                </StackPanel>
+
+            </Grid>
+
+        </Grid>
+        <Grid Margin="10" Visibility="{Binding DragDropGridVisibility}">
+            <Border  BorderThickness="10">
+                <Border.BorderBrush>
+                    <VisualBrush>
+                        <VisualBrush.Visual>
+                            <Rectangle StrokeDashArray="4 2" Stroke="Gray" StrokeThickness="1"
+                                  Width="100" Height="100"/>
+                        </VisualBrush.Visual>
+                    </VisualBrush>
+                </Border.BorderBrush>
+            </Border>
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <icons:PackIconBootstrapIcons Kind="CloudArrowUp" HorizontalAlignment="Center" Height="100" Width="100"/>
+                <Label Content="Перетащите файл в выделенную область"  FontSize="18" FontWeight="Bold"/>
+            </StackPanel>
+        </Grid>
+
+    </Grid>
+</Page>
